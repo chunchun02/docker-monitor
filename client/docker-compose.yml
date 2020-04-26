@@ -1,0 +1,10 @@
+version: "3"
+services:
+  zabbix_agent:
+    image: zabbix/zabbix-agent:${OS}-${VERSION}
+    container_name: zabbix_agent
+    privileged: true
+    environment:
+      - ZBX_SERVER_HOST=${SERVER_HOST}
+    expose:
+      - "10050"

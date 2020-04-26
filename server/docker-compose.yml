@@ -1,0 +1,49 @@
+version: "3"
+services:
+  zabbix_db:
+    image: mysql:5.7
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    container_name: zabbix_db
+    environment:
+      - MYSQL_DATABASE=${DB_NAME}
+      - MYSQL_USER=${DB_USER}
+      - MYSQL_PASSWORD=${DB_USER_PASSWORD}
+      - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
+  zabbix_server:
+    image: zabbix/zabbix-server-mysql:${OS}-${VERSION}
+    container_name: zabbix_server
+    environment:
+      - DB_SERVER_HOST=zabbix_db
+      - MYSQL_DATABASE=${DB_NAME}
+      - MYSQL_USER=${DB_USER}
+      - MYSQL_PASSWORD=${DB_USER_PASSWORD}
+      - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
+      - ZBX_DEBUGLEVEL=${LOG_LEVEL}
+    ports:
+      - "10051:10051"
+    links:
+      - zabbix_db
+  zabbix_web:
+    image: zabbix/zabbix-web-apache-mysql:${OS}-${VERSION}
+    container_name: zabbix_web
+    environment:
+      - ZBX_SERVER_HOST=zabbix_server
+      - DB_SERVER_HOST=zabbix_db
+      - MYSQL_DATABASE=${DB_NAME}
+      - MYSQL_USER=${DB_USER}
+      - MYSQL_PASSWORD=${DB_USER_PASSWORD}
+      - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
+      - PHP_TZ=${TIME_ZONE}
+    ports:
+      - ${HTTP_PORT}:80
+    links:
+      - zabbix_server
+      - zabbix_db
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    environment:
+      GF_INSTALL_PLUGINS: alexanderzobnin-zabbix-app
+    ports:
+      - 3000:3000
+    restart: always
