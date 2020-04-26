@@ -10,8 +10,6 @@ services:
     volumes:
       - /:/rootfs
       - /var/run:/var/run
-    expose:
-      - "10050"
     ports:
       - "10050:10050"
     restart: always
