@@ -1,10 +1,17 @@
-version: "3"
+version: '3'
 services:
-  zabbix_agent:
-    image: zabbix/zabbix-agent:${OS}-${VERSION}
-    container_name: zabbix_agent
-    privileged: true
+  docker-zabbix-agent:
+    image: monitoringartist/dockbix-agent-xxl-limited:latest
+    container_name: docker-zabbix-agent
+    hostname: docker
     environment:
-      - ZBX_SERVER_HOST=${SERVER_HOST}
+      ZA_Server: 192.168.0.56,172.19.0.1
+      ZA_ServerActive: 192.168.0.56
+    volumes:
+      - /:/rootfs
+      - /var/run:/var/run
     expose:
       - "10050"
+    ports:
+      - "10050:10050"
+    restart: always
